@@ -1,0 +1,111 @@
+import numpy as np
+
+ROW_SIZE = 7
+COLUMN_SIZE = 8
+MAT_SIZE = (ROW_SIZE, COLUMN_SIZE)
+# player_first = input("Player One, please type your name and press ENTER key \n ").title()
+# player_second = input("Player Two, please type your name and press ENTER key \n ").title()
+player_first = "Ehsan"
+player_second = "Sepideh"
+
+
+def create_board():
+    """Create the matrix for game board """
+    matrix = np.zeros(MAT_SIZE)
+    return matrix
+
+
+def print_board(mat):
+    """print the board upside down and put label to help to decide"""
+    print("  1. 2. 3. 4. 5. 6. 7. 8.")
+    print(np.flip(mat, 0))
+    # print("\n  1. 2. 3. 4. 5. 6. 7. 8. ")
+
+
+def player_choice_input(name):
+    """take the players choice and check if it is correct"""
+    option = input(f"\n {name}, Enter the column number between 1 - {COLUMN_SIZE}  and press ENTER key. ")
+    while not 0 < int(option) < COLUMN_SIZE + 1:
+        option = input(f"{name}, Wrong value entered. please choose between1 - {COLUMN_SIZE}  and press ENTER key.  ")
+    return int(option)
+
+
+def check_valid_column(mat, row, col):
+    return mat[row - 1, col] == 0
+
+
+def first_empty_space(mat, col):
+    """Find the first empty sopt to put the piece"""
+    for r in range(ROW_SIZE):
+        if mat[r, col] == 0:
+            return r
+
+
+def place_player_mark(mat, row, col, player_name):
+    """put the player name in the correct place"""
+    mat[row, col] = player_name
+
+
+def winner_check(mat, col, mark, player_name):
+    """check if this move cause to win and finish the game"""
+
+    # vertical:
+    for r in range(ROW_SIZE - 3):
+        for c in range(COLUMN_SIZE):
+            if mat[r, c] == mark and mat[r + 1, c] == mark and mat[r + 2, c] == mark and mat[r + 3, c] == mark:
+                print(f"Congratulations, {player_name} won the game")
+                return True
+
+    # horizon:
+    for r in range(ROW_SIZE):
+        for c in range(COLUMN_SIZE - 3):
+            if mat[r, c] == mark and mat[r, c + 1] == mark and mat[r, c + 2] == mark and mat[r, c + 3] == mark:
+                print(f"Congratulations, {player_name} won the game")
+                return True
+
+    # positive :
+    for r in range(ROW_SIZE - 3):
+        for c in range(COLUMN_SIZE - 3):
+            if mat[r, c] == mark and mat[r + 1, c + 1] == mark and mat[r + 2, c + 2] == mark and \
+                    mat[r + 3, c + 3] == mark:
+
+                print(f"Congratulations, {player_name} won the game")
+                return True
+
+    # negative :
+    for r in range(3, ROW_SIZE):
+        for c in range(COLUMN_SIZE - 3):
+            if mat[r, c] == mark and mat[r - 1, c + 1] == mark and mat[r - 2, c + 2] == mark and \
+                    mat[r - 3, c + 3] == mark:
+                print(f"Congratulations, {player_name} won the game")
+                return True
+
+
+board = create_board()
+print_board(board)
+
+turn = 1
+game_over = False
+while not game_over:
+
+    # ask First player
+    if turn % 2 == 1:
+        choice = player_choice_input(player_first)
+        check_valid_column(board, ROW_SIZE, choice - 1)
+        empty_row = first_empty_space(board, choice - 1)
+        place_player_mark(board, empty_row, choice - 1, 1)
+        print_board(board)
+        if winner_check(mat=board, col=choice - 1, mark=1, player_name=player_first):
+            game_over = True
+
+    # ask Second player
+    if turn % 2 == 0:
+        choice = player_choice_input(player_second)
+        check_valid_column(board, ROW_SIZE, choice - 1)
+        empty_row = first_empty_space(board, choice - 1)
+        place_player_mark(board, empty_row, choice - 1, 2)
+        print_board(board)
+        if winner_check(mat=board, col=choice - 1, mark=2, player_name=player_second):
+            game_over = True
+
+    turn += 1
